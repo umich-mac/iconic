@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -13,7 +12,7 @@ import (
 
 func HashFile(filename string) string {
 	hasher := sha256.New()
-	s, err := ioutil.ReadFile(filename)
+	s, err := os.ReadFile(filename)
 	hasher.Write(s)
 	if err != nil {
 		fmt.Println(err)
