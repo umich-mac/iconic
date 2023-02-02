@@ -3,40 +3,58 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 
 	"howett.net/plist"
 )
 
-func HashFile(filename string) string {
+func HashFile(filename string) (string, error) {
 	hasher := sha256.New()
 	s, err := os.ReadFile(filename)
 	hasher.Write(s)
 	if err != nil {
-		fmt.Println(err)
+		return "", err
 	}
 
-	return hex.EncodeToString(hasher.Sum(nil))
+	return hex.EncodeToString(hasher.Sum(nil)), nil
 }
 
 func main() {
-	encoder := plist.NewEncoderForFormat(os.Stdout, plist.XMLFormat)
-	encoder.Indent("\t")
-
-	files, err := filepath.Glob("*.png")
+	icons, err := filepath.Glob("*.png")
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalf("could not find *.png files: %v", err)
 	}
 
 	hashes := make(map[string]string)
 
-	for _, file := range files {
-		hashes[file] = HashFile(file)
+	for _, icon := range icons {
+		hash, err := HashFile(icon)
+		if err != nil {
+			log.Fatalf("could not open file: %v", err)
+		}
+		hashes[icon] = hash
 	}
 
+	tempout, err := os.CreateTemp(".", "iconic-*.plist")
+	if err != nil {
+		log.Fatalf("could not open temp file: %v", err)
+	}
+	defer os.Remove(tempout.Name())
+
+	encoder := plist.NewEncoderForFormat(tempout, plist.XMLFormat)
+	encoder.Indent("\t")
 	encoder.Encode(hashes)
-	fmt.Println("")
+
+	if err := tempout.Close(); err != nil {
+		log.Fatalf("could not save temp results: %v", err)
+	}
+
+	// replace
+	err = os.Rename(tempout.Name(), "_icons_hash.plist")
+	if err != nil {
+		log.Fatalf("could not replace _icons_hash.plist: %v", err)
+	}
 
 }

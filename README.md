@@ -5,6 +5,4 @@ in go to be portable and not require a runtime.
 
 `go build .` to produce the binary.
 
-`./iconic > _icon_hashes.plist` to create the hash.
-
-Probably needs better understanding of file paths someday.
+`./iconic` to create the hash.
