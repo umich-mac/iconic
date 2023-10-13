@@ -52,9 +52,9 @@ func main() {
 	}
 
 	// replace
-	err = os.Rename(tempout.Name(), "_icons_hash.plist")
+	err = os.Rename(tempout.Name(), "_icon_hashes.plist")
 	if err != nil {
-		log.Fatalf("could not replace _icons_hash.plist: %v", err)
+		log.Fatalf("could not replace _icon_hashes.plist: %v", err)
 	}
 
 }
