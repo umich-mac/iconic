@@ -57,4 +57,8 @@ func main() {
 		log.Fatalf("could not replace _icon_hashes.plist: %v", err)
 	}
 
+	// CreateTemp makes files 0600; make the output world-readable
+	if err := os.Chmod("_icon_hashes.plist", 0644); err != nil {
+		log.Fatalf("could not chmod _icon_hashes.plist: %v", err)
+	}
 }
